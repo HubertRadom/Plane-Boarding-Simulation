@@ -87,7 +87,7 @@ while True:
                 else:
                     down(ball)
 
-            if ball.position[1] < 0: #up
+            elif ball.position[1] < 0: #up
                 if ball.position[1] == -1:
                     for ball2 in ballList:
                         if ball.position[0] == ball2.position[0] and ball2.position[1] == 0:
