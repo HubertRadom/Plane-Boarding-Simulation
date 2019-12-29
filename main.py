@@ -1,10 +1,14 @@
 import turtle
 import time
 import random
+from World import World
+from Passenger import Passenger
+from StepCounter import StepCounter
+
 
 wn = turtle.Screen()
-wn.title("Pong")
-wn.bgpic("C:\\Users\\Hubert\\Desktop\\chart.png")
+wn.title("Plane")
+wn.bgpic("./chart.png")
 wn.tracer(0)
 
 #list of some random colors xD
@@ -24,137 +28,29 @@ for i in range(1, 17): #creating list of possible destinies
 ballList = [] #list of turtles
 
 for i in range(96): #creating passengers
-    ball = turtle.Turtle()
-    ball.speed(0)
-    #ball.shape('square')
-    #ball.color('black')
-    ball.shape("turtle")
-    ball.color(random.choice(randomColors))
-    ball.penup()
-    ball.goto(-285, 0)
-    ball.destiny = random.choice(randomDestiny)
-    randomDestiny.remove(ball.destiny)
-    ball.position = [-2,0] #position X,Y
-    ball.shuffle = False
-    ball.comeback = False
-    ballList.append(ball)
+    destiny = random.choice(randomDestiny)
+    randomDestiny.remove(destiny)
+    World.get_instance().add_passenger(Passenger(random.choice(randomColors),destiny))
 
 
 #Pen
-pen = turtle.Turtle() #steps counter
-pen.speed(0)
-pen.color("black")
-pen.penup()
-pen.hideturtle()
-pen.goto(0, 260)
-pen.write("steps: 0", align = "center", font=("Courier", 24, "normal"))
-
-#Move
-def right(ball):
-    x = ball.xcor()
-    ball.setx(x+30)
-    ball.position[0]+=1
-def left(ball):
-    x = ball.xcor()
-    ball.setx(x-30)
-    ball.position[0]-=1
-def up(ball):
-    y = ball.ycor()
-    ball.sety(y+30)
-    ball.position[1]+=1
-def down(ball):
-    y = ball.ycor()
-    ball.sety(y-30)
-    ball.position[1]-=1
+stepsCounter = StepCounter()
     
 
 # Main game loop
 steps=0
-block=False
 while True:
-    wn.update()
-    for ball in ballList:
-        block = False
-        if ball.shuffle == True: #seat shuffling ball is going to the corridor  
-            #block = False
-            if ball.position[1] > 0: #down
-                if ball.position[1] == 1:
-                    for ball2 in ballList:
-                        if ball.position[0] == ball2.position[0] and ball2.position[1] == 0:
-                            block = True
-                    if block == False:
-                        down(ball)
-                else:
-                    down(ball)
-
-            elif ball.position[1] < 0: #up
-                if ball.position[1] == -1:
-                    for ball2 in ballList:
-                        if ball.position[0] == ball2.position[0] and ball2.position[1] == 0:
-                            block = True
-                    if block == False:
-                        up(ball)
-                else:
-                    up(ball)
-
-            elif ball.position[1] == 0:
-                right(ball)
-
-                ball.shuffle = False
-                ball.comeback = True
-
-        elif ball.comeback == True: #ball is coming back to destiny X
-            block = False
-            for ball2 in ballList:
-                if ball.position[0]-2 == ball2.position[0] and ball.destiny[0] == ball2.destiny[0]:
-                    block = True
-            if block == False:
-                left(ball)
-                ball.comeback = False
-        
-        else:
-            if ball.position[0] == ball.destiny[0]: #if ball is on correct X
-                if ball.position[1] != ball.destiny[1]: #if ball isn't on destiny
-                    if ball.position[1] > ball.destiny[1]: #should goes down
-                        down(ball)
-                    else:                           #should goes up
-                        up(ball)
-            else:                                   #if ball isn't on correct X
-                for ball2 in ballList:
-                   
-                    if ball.position[0]+1 == ball.destiny[0]: #if next X is correct
-                        #if it requires seat shuffle (2 options)
-                        if ball.position[0]+1 == ball2.position[0] and ball.destiny[1] > 0 and ball2.position[1] > 0 and ball.destiny[1] > ball2.position[1]:
-                            block = True
-                            ball2.shuffle = True
-                        if ball.position[0]+1 == ball2.position[0] and ball.destiny[1] < 0 and ball2.position[1] < 0 and ball.destiny[1] < ball2.position[1]:
-                            block = True
-                            ball2.shuffle = True
-                    
-                    if ball.position[0]+1 == ball2.position[0] and ball.position[1] == ball2.position[1]: #if corridor is blocked
-                        block = True
-                    #if it isn't ball that caused shuffeling and should wait for coming back
-                    if ball.position[0]+2 == ball2.position[0] and ball2.comeback == True and ball.destiny[0] != ball2.destiny[0]:
-                        block = True
-
-                if block == False:  #if corridor isn't blocked
-                    right(ball)
-                block = False
-
-
-    pen.clear()
     steps+=1
-    pen.write("steps: {}".format(steps), align = "center", font=("Courier", 50, "normal"))
-    time.sleep(0.1)
-    #print("=====================================")
-    #for ball in ballList:
-    #    print(ball.position, ball.destiny, ball.position==ball.destiny, ball.xcor(), ball.ycor())
-
+    World.get_instance().update()
+    stepsCounter.updateSteps(steps)
+    for passenger in World.get_instance().passengers:
+        passenger.move()
     #end of symulation
     end = True
-    for ball in ballList:
+    for ball in World.get_instance().passengers:
         if ball.position != ball.destiny:
             end = False
     if end == True:
         wn.update()
         break
+    time.sleep(0.1)
