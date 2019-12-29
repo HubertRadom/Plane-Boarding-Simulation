@@ -24,9 +24,6 @@ for i in range(1, 17): #creating list of possible destinies
             randomDestiny[k].append(j)
             k+=1
 
-#Ball
-ballList = [] #list of turtles
-
 for i in range(96): #creating passengers
     destiny = random.choice(randomDestiny)
     randomDestiny.remove(destiny)
