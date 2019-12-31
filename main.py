@@ -27,7 +27,7 @@ for i in range(1, 17): #creating list of possible destinies
 for i in range(96): #creating passengers
     destiny = random.choice(randomDestiny)
     randomDestiny.remove(destiny)
-    World.get_instance().add_passenger(Passenger(random.choice(randomColors),destiny))
+    World.get_instance().add_passenger(Passenger(random.choice(randomColors),destiny,i))
 
 
 #Pen

@@ -12,7 +12,8 @@ class State(Enum):
     COMMING_BACK=5
 
 class Passenger():
-    def __init__(self,color,destiny):
+    def __init__(self,color,destiny,id):
+        self.id=id
         self.body = turtle.Turtle()
         self.body.speed(0)
         self.body.shape('turtle')
@@ -46,20 +47,14 @@ class Passenger():
             #block = False
             if self.position[1] > 0: #down
                 if self.position[1] == 1:
-                    for ball2 in World.get_instance().passengers:
-                        if self.position[0] == ball2.position[0] and ball2.position[1] == 0:
-                            block = True
-                    if block == False:
+                    if not World.get_instance().is_corridor_blocked(self.position[0]):
                         self.down()
                 else:
                     self.down()
 
             elif self.position[1] < 0: #up
                 if self.position[1] == -1:
-                    for ball2 in World.get_instance().passengers:
-                        if self.position[0] == ball2.position[0] and ball2.position[1] == 0:
-                            block = True
-                    if block == False:
+                    if not World.get_instance().is_corridor_blocked(self.position[0]):
                         self.up()
                 else:
                     self.up()
@@ -71,11 +66,7 @@ class Passenger():
                 self.comeback = True
 
         elif self.comeback == True: #ball is coming back to destiny X
-            block = False
-            for ball2 in World.get_instance().passengers:
-                if self.position[0]-2 == ball2.position[0] and self.destiny[0] == ball2.destiny[0]:
-                    block = True
-            if block == False:
+            if not World.get_instance().is_seatmate_waiting(self):
                 self.left()
                 self.comeback = False
         
@@ -86,23 +77,16 @@ class Passenger():
                         self.down()
                     else:                           #should goes up
                         self.up()
-            else:                                   #if ball isn't on correct X
-                for ball2 in World.get_instance().passengers:
-                   
-                    if self.position[0]+1 == self.destiny[0]: #if next X is correct
-                        #if it requires seat shuffle (2 options)
-                        if self.position[0]+1 == ball2.position[0] and self.destiny[1] > 0 and ball2.position[1] > 0 and self.destiny[1] > ball2.position[1]:
-                            block = True
-                            ball2.shuffle = True
-                        if self.position[0]+1 == ball2.position[0] and self.destiny[1] < 0 and ball2.position[1] < 0 and self.destiny[1] < ball2.position[1]:
-                            block = True
-                            ball2.shuffle = True
-                    
-                    if self.position[0]+1 == ball2.position[0] and self.position[1] == ball2.position[1]: #if corridor is blocked
+            else:                                   #if ball isn't on correct X                   
+                if self.position[0]+1 == self.destiny[0]: #if next X is correct
+                    #if it requires seat shuffle
+                    for other in World.get_instance().get_blocking_seatmates(self):
                         block = True
-                    #if it isn't ball that caused shuffeling and should wait for coming back
-                    if self.position[0]+2 == ball2.position[0] and ball2.comeback == True and self.destiny[0] != ball2.destiny[0]:
-                        block = True
+                        other.shuffle = True
+                
+                if (World.get_instance().is_corridor_blocked_rightside(self) or 
+                    World.get_instance().are_passengers_coming_back(self)):#if it isn't ball that caused shuffeling and should wait for coming back
+                    block = True
 
                 if block == False:  #if corridor isn't blocked
                     self.right()
