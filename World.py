@@ -1,4 +1,5 @@
 import turtle
+from State import State
 
 class World():
     instance=None
@@ -42,7 +43,7 @@ class World():
         return seatmates
     def are_passengers_coming_back(self,passenger):
         for other in self.passengers:
-            if passenger.position[0]+2 == other.position[0] and other.comeback == True and passenger.destiny[0] != other.destiny[0]:
+            if passenger.position[0]+2 == other.position[0] and other.state == State.COMMING_BACK and passenger.destiny[0] != other.destiny[0]:
                 return True
         return False
     
