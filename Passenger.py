@@ -12,7 +12,7 @@ class State(Enum):
     COMMING_BACK=5
 
 class Passenger():
-    def __init__(self,color,destiny,id):
+    def __init__(self,color,destiny,id,stow_time):
         self.id=id
         self.body = turtle.Turtle()
         self.body.speed(0)
@@ -22,6 +22,7 @@ class Passenger():
         self.body.goto(-285,0)
         self.destiny = destiny
         self.position=[-2,0]
+        self.stow_time = stow_time
         #self.state = State.GOING_TO_SEAT
         self.shuffle = False
         self.comeback = False
@@ -73,7 +74,9 @@ class Passenger():
         else:
             if self.position[0] == self.destiny[0]: #if ball is on correct X
                 if self.position[1] != self.destiny[1]: #if ball isn't on destiny
-                    if self.position[1] > self.destiny[1]: #should goes down
+                    if self.stow_time > 0:
+                        self.stow_time-=1
+                    elif self.position[1] > self.destiny[1]: #should goes down
                         self.down()
                     else:                           #should goes up
                         self.up()
