@@ -34,51 +34,71 @@ class Passenger():
         self.body.sety(y-30)
         self.position[1]-=1
     def move(self):
-        block = False
-        if self.state == State.SHUFFLING: #seat shuffling ball is going to the corridor  
-            if self.position[1] > 0: #down
-                if self.position[1] == 1:
-                    if not World.get_instance().is_corridor_blocked(self.position[0]):
-                        self.down()
-                else:
-                    self.down()
-
-            elif self.position[1] < 0: #up
-                if self.position[1] == -1:
-                    if not World.get_instance().is_corridor_blocked(self.position[0]):
-                        self.up()
-                else:
-                    self.up()
-
-            elif self.position[1] == 0:
-                self.right()
-
-                self.state = State.COMMING_BACK
-
-        elif self.state == State.COMMING_BACK: #ball is coming back to destiny X
-            if not World.get_instance().is_seatmate_waiting(self):
-                self.left()
-                self.state = State.GOING_TO_SEAT
-        
+        if self.state == State.SHUFFLING:
+            self.move_shuffle()
+        elif self.state == State.COMMING_BACK:
+            self.move_comming_back()
+        elif self.state == State.GOING_TO_SEAT:
+            self.move_to_seat()
+    def move_shuffle(self):
+        if self.position[1] > 0:
+            if not World.get_instance().get_neighbour_cell(self,0,-1):
+                self.down()
+        elif self.position[1] < 0:
+            if not World.get_instance().get_neighbour_cell(self,0,1):
+                self.up()
         else:
-            if self.position[0] == self.destiny[0]: #if ball is on correct X
-                if self.position[1] != self.destiny[1]: #if ball isn't on destiny
-                    if self.stow_time > 0:
-                        self.stow_time-=1
-                    elif self.position[1] > self.destiny[1]: #should goes down
-                        self.down()
-                    else:                           #should goes up
-                        self.up()
-            else:                                   #if ball isn't on correct X                   
-                if self.position[0]+1 == self.destiny[0]: #if next X is correct
-                    #if it requires seat shuffle
-                    for other in World.get_instance().get_blocking_seatmates(self):
-                        block = True
-                        other.state = State.SHUFFLING
-                
-                if (World.get_instance().is_corridor_blocked_rightside(self) or 
-                    World.get_instance().are_passengers_coming_back(self)):#if it isn't ball that caused shuffeling and should wait for coming back
-                    block = True
-
-                if block == False:  #if corridor isn't blocked
+            left_neighbour = World.get_instance().get_neighbour_cell(self,-1,0)
+            if left_neighbour and self.position[0]< self.destiny[0]+2 and(not left_neighbour.state == State.GOING_TO_SEAT or self.position[0] == self.destiny[0]):
+                right_neighbour_2 = World.get_instance().get_neighbour_cell(self,2,0)
+                if not World.get_instance().get_neighbour_cell(self,1,0) and (not right_neighbour_2 or (not right_neighbour_2.state in[State.SHUFFLING,State.COMMING_BACK] or self.destiny[0]==right_neighbour_2.destiny[0])):#risky
                     self.right()
+    def move_comming_back(self):
+        if self.position[0] == self.destiny[0]:
+            if self.position[1] == self.destiny[1]:
+                self.state = State.SEATING
+            elif self.position[1] < self.destiny[1]:
+                self.up()
+            else:
+                self.down()
+        else:
+            left_neighbour = World.get_instance().get_neighbour_cell(self,-1,0)
+            if left_neighbour and(left_neighbour.state==State.SHUFFLING or left_neighbour.destiny[0]==self.destiny[0]):
+                return
+            left_neighbour_2 = World.get_instance().get_neighbour_cell(self,-2,0)
+
+            if left_neighbour_2 and self.has_similar_destiny(left_neighbour_2) and not left_neighbour_2.state == State.COMMING_BACK:
+                return
+            self.left()
+    def move_to_seat(self):
+        if self.position[0] == self.destiny[0]: #if ball is on correct X
+            if self.position[1] != self.destiny[1]: #if ball isn't on destiny
+                if self.stow_time > 0:
+                    self.stow_time-=1
+                elif self.position[1] > self.destiny[1]: #should goes down
+                    self.down()
+                else:                           #should goes up
+                    self.up()
+            else:
+                self.state=State.SEATING
+                for other in World.get_instance().get_shuffeled_seatmates(self):
+                    other.state=State.COMMING_BACK
+        else:                                   #if ball isn't on correct X                   
+            block=False
+            if self.position[0]+1 == self.destiny[0]: #if next X is correct
+                #if it requires seat shuffle
+                for other in World.get_instance().get_blocking_seatmates(self):
+                    block = True
+                    other.state = State.SHUFFLING
+            right_neighbour_2 = World.get_instance().get_neighbour_cell(self,2,0)
+            if (World.get_instance().get_neighbour_cell(self,1,0) or 
+                (right_neighbour_2 and (right_neighbour_2.state==State.SHUFFLING or right_neighbour_2.state==State.COMMING_BACK) 
+                and not self.has_similar_destiny(right_neighbour_2) )):
+                block=True
+        
+            if block == False:  #if corridor isn't blocked
+                self.right()
+    def has_similar_destiny(self,other):
+        return other.destiny[0] == self.destiny[0] and ((self.destiny[1]>0) == (other.destiny[1]>0))
+        
+        

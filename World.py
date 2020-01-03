@@ -37,8 +37,8 @@ class World():
     def get_blocking_seatmates(self,passenger):
         seatmates=[]
         for other in self.passengers:
-            if (passenger.position[0]+1 == other.position[0] and passenger.destiny[1] > 0 and other.position[1] > 0 and passenger.destiny[1] > other.position[1] or
-            passenger.position[0]+1 == other.position[0] and passenger.destiny[1] < 0 and other.position[1] < 0 and passenger.destiny[1] < other.position[1]):
+            if (passenger.position[0]+1 == other.position[0] and passenger.destiny[1] > 0 and other.position[1] > 0 and passenger.destiny[1] > other.destiny[1] or
+            passenger.position[0]+1 == other.position[0] and passenger.destiny[1] < 0 and other.position[1] < 0 and passenger.destiny[1] < other.destiny[1]):
                 seatmates.append(other)
         return seatmates
     def are_passengers_coming_back(self,passenger):
@@ -46,4 +46,15 @@ class World():
             if passenger.position[0]+2 == other.position[0] and other.state == State.COMMING_BACK and passenger.destiny[0] != other.destiny[0]:
                 return True
         return False
+    def get_neighbour_cell(self,passenger,relX,relY):
+        for other in self.passengers:
+            if passenger.position[0]+relX == other.position[0] and passenger.position[1]+relY == other.position[1]:
+                return other
+        return None
+    def get_shuffeled_seatmates(self,passenger):
+        others=[]
+        for other in self.passengers:
+            if passenger.destiny[0] == other.destiny[0] and other.state == State.SHUFFLING:
+                others.append(other)
+        return others
     
