@@ -11,3 +11,5 @@ class StepCounter():
     def updateSteps(self,steps):
         self.body.clear()
         self.body.write("steps: "+str(steps), align = "center", font=("Courier", 24, "normal"))
+    def clear(self):
+        self.body.clear()

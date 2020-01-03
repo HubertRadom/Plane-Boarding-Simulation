@@ -19,6 +19,16 @@ class World():
         self.passengers.append(passenger)
     def update(self):
         self.screen.update()
+    def reset(self):
+        for p in self.passengers:
+            p.body.clear()
+        self.passengers = []
+        self.screen.clear()
+        self.screen.title("Plane")
+        self.screen.bgpic("./chart.png")
+        self.screen.tracer(0)
+        self.screen.update()
+
     def is_corridor_blocked(self,positionX):
         for other in self.passengers:
             if positionX == other.position[0] and other.position[1] == 0:
