@@ -19,7 +19,7 @@ for i in range(1, 17): #creating list of possible destinies
             randomDestiny[k].append(i)
             randomDestiny[k].append(j)
             k+=1
-stow_times =[0]*number_of_passengers# list(np.random.normal(loc=5.0,size=number_of_passengers))
+stow_times =list(np.random.normal(loc=5.0,size=number_of_passengers))
 for i in range(number_of_passengers): #creating passengers
     destiny = random.choice(randomDestiny)
     randomDestiny.remove(destiny)

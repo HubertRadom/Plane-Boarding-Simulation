@@ -57,4 +57,10 @@ class World():
             if passenger.destiny[0] == other.destiny[0] and other.state == State.SHUFFLING:
                 others.append(other)
         return others
+    def are_oposite_shuffling(self,passenger):
+        others =[]
+        for other in self.passengers:
+            if other.destiny[0] == passenger.destiny[0] and not (other.destiny[1]>0) == (passenger.destiny[1]>0) and other.state in [State.SHUFFLING,State.COMMING_BACK]:
+                others.append(other)
+        return len(others)>0
     

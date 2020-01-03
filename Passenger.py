@@ -87,9 +87,16 @@ class Passenger():
             block=False
             if self.position[0]+1 == self.destiny[0]: #if next X is correct
                 #if it requires seat shuffle
-                for other in World.get_instance().get_blocking_seatmates(self):
-                    block = True
-                    other.state = State.SHUFFLING
+                blocking_seatmates=World.get_instance().get_blocking_seatmates(self)
+                if len(blocking_seatmates)>0:
+                    block=True
+                    if not World.get_instance().are_oposite_shuffling(self):
+                        for s in blocking_seatmates:
+                            s.state=State.SHUFFLING
+
+                # for other in World.get_instance().get_blocking_seatmates(self) :
+                #     block = True
+                #     other.state = State.SHUFFLING
             right_neighbour_2 = World.get_instance().get_neighbour_cell(self,2,0)
             if (World.get_instance().get_neighbour_cell(self,1,0) or 
                 (right_neighbour_2 and (right_neighbour_2.state==State.SHUFFLING or right_neighbour_2.state==State.COMMING_BACK) 
