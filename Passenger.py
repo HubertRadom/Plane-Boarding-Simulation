@@ -38,36 +38,47 @@ class Passenger():
         if self.state == State.SHUFFLING: #seat shuffling ball is going to the corridor  
             if self.position[1] > 0: #down
                 if self.position[1] == 1:
-                    if not World.get_instance().is_corridor_blocked(self.position[0]):
+                    if not World.get_instance().is_corridor_blocked(self.position[0]) and not World.get_instance().is_other_coming_back_down(self):
                         self.down()
-                else:
+                elif not World.get_instance().is_other_down(self) and not World.get_instance().is_other_stowing_down(self):
                     self.down()
 
             elif self.position[1] < 0: #up
                 if self.position[1] == -1:
-                    if not World.get_instance().is_corridor_blocked(self.position[0]):
+                    if not World.get_instance().is_corridor_blocked(self.position[0]) and not World.get_instance().is_other_coming_back_up(self):
                         self.up()
-                else:
+                elif not World.get_instance().is_other_up(self) and not World.get_instance().is_other_stowing_up(self):
                     self.up()
 
             elif self.position[1] == 0:
-                self.right()
-
-                self.state = State.COMMING_BACK
+                if (World.get_instance().is_corridor_blocked_rightside(self) or World.get_instance().are_passengers_coming_back(self)): 
+                    block = True
+                if block == False:  #if corridor isn't blocked
+                    self.right()
+                    self.state = State.COMMING_BACK
 
         elif self.state == State.COMMING_BACK: #ball is coming back to destiny X
-            if not World.get_instance().is_seatmate_waiting(self):
-                self.left()
-                self.state = State.GOING_TO_SEAT
+            if (World.get_instance().is_other_shuffeling(self)) and not (World.get_instance().is_corridor_blocked_rightside(self) 
+                and not World.get_instance().are_passengers_coming_back(self)):
+                self.right()
+            elif not World.get_instance().is_seatmate_waiting(self):
+                if self.position[0]-2 == self.destiny[0]:
+                    self.left()
+                else:
+                    self.left()
+                    self.state = State.GOING_TO_SEAT
         
         else:
             if self.position[0] == self.destiny[0]: #if ball is on correct X
                 if self.position[1] != self.destiny[1]: #if ball isn't on destiny
                     if self.stow_time > 0:
+                        self.body.shape('square')
                         self.stow_time-=1
                     elif self.position[1] > self.destiny[1]: #should goes down
+                        self.body.shape('turtle')
                         self.down()
                     else:                           #should goes up
+                        self.body.shape('turtle')
                         self.up()
             else:                                   #if ball isn't on correct X                   
                 if self.position[0]+1 == self.destiny[0]: #if next X is correct
@@ -75,9 +86,10 @@ class Passenger():
                     for other in World.get_instance().get_blocking_seatmates(self):
                         block = True
                         other.state = State.SHUFFLING
-                
+
+                #if it isn't ball that caused shuffeling and should wait for coming back
                 if (World.get_instance().is_corridor_blocked_rightside(self) or 
-                    World.get_instance().are_passengers_coming_back(self)):#if it isn't ball that caused shuffeling and should wait for coming back
+                    (World.get_instance().are_passengers_coming_back(self) and not World.get_instance().is_coming_back_seatmate(self))):
                     block = True
 
                 if block == False:  #if corridor isn't blocked
