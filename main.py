@@ -1,48 +1,44 @@
-import turtle
-import time
-import random
-from World import World
-from Passenger import Passenger
-from StepCounter import StepCounter
-import numpy as np
+from GameRunner import Game
+from orders_generation import *
+import matplotlib.pyplot as plt
+   
+def conduct_test(test,visualise,should_stow=True):
+  print("Starting test: "+test[0])
+  STEPS=[]
+  for i in range(ITERATIONS):
+    print("Iteration: "+str(i+1)+"/"+str(ITERATIONS))
+    game = Game(test[1],visualise)
+    STEPS.append(game.play(should_stow))
+  plt.hist(STEPS,5,density=True)
+  plt.savefig(test[0]+".png")
+  plt.clf()
 
-#list of some random colors
-randomColors = ["#AF88A2","#6B9EA6","#A51480","#E7233C","#50675D","#DFC6EA","#67D29B","#4DF238","#97B2E9","#6A4DD2","#A32E14","#C6C132","#4FCD5C",\
-                "#CEC293","#19054E","#DE56F4","#DE5080","#C57338","#AD7D1B",]
-randomDestiny = []
-k=0
-for i in range(1, 17): #creating list of possible destinies
-    for j in range(-3, 4):
-        if j!=0:
-            randomDestiny.append([])
-            randomDestiny[k].append(i)
-            randomDestiny[k].append(j)
-            k+=1
-stow_times = list(np.random.normal(loc=5.0,size=96))
-for i in range(96): #creating passengers
-    destiny = random.choice(randomDestiny)
-    randomDestiny.remove(destiny)
-    World.get_instance().add_passenger(Passenger(random.choice(randomColors),destiny,i,stow_times[i]))
+ITERATIONS=10
+VISUALISE=False
+
+tests = [["RANDOM",random_order()],
+["BACK TO FRONT",back_to_front()],
+["FRONT TO BACK",front_to_back()],
+["BACK TO FRONT GROUP 4",back_to_front_4()],
+["FRONT TO BACK GROUP 4",front_to_back_4()],
+["WINDOW MIDDLE ISLE",window_middle_isle()],
+["STEFFEN PERFECT",steffen_perfect()],
+"STEFFEN MODIFIED",steffen_modified()]
+
+for test in tests:
+  conduct_test(test,VISUALISE)
 
 
-#Steps Counter
-stepsCounter = StepCounter()
-    
+no_stowing_tests = [["RANDOM NO STOWING",random_order()],
+["BACK TO FRONT 4 GROUPS NO STOWING",back_to_front_4()]]
 
-# Main game loop
-steps=0
-while True:
-    steps+=1
-    World.get_instance().update()
-    stepsCounter.updateSteps(steps)
-    for passenger in World.get_instance().passengers:
-        passenger.move()
-    #end of symulation
-    end = True
-    for ball in World.get_instance().passengers:
-        if ball.position != ball.destiny:
-            end = False
-    if end == True:
-        World.get_instance().update()
-        break
-    time.sleep(0.1)
+for test in no_stowing_tests:
+  conduct_test(test,VISUALISE,False)
+
+no_shuffling_tests = [["RANDOM NO STOWING",random_without_shuffle()],
+["BACK TO FRONT 4 GROUPS NO STOWING",back_to_front_4_without_shuffle()]]
+
+for test in no_shuffling_tests:
+  conduct_test(test,VISUALISE)
+
+
