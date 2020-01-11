@@ -53,8 +53,10 @@ class World():
     def get_blocking_seatmates(self,passenger):
         seatmates=[]
         for other in self.passengers:
-            if (passenger.position[0]+1 == other.position[0] and passenger.destiny[1] > 0 and other.position[1] > 0 and passenger.destiny[1] > other.position[1] or
-            passenger.position[0]+1 == other.position[0] and passenger.destiny[1] < 0 and other.position[1] < 0 and passenger.destiny[1] < other.position[1]):
+            if (passenger.position[0]+1 == other.position[0] and passenger.destiny[1] > 0 and other.position[1] > 0 and passenger.destiny[1] > other.position[1]
+            and passenger.destiny[1] > other.destiny[1] or
+            passenger.position[0]+1 == other.position[0] and passenger.destiny[1] < 0 and other.position[1] < 0 and passenger.destiny[1] < other.position[1]
+            and passenger.destiny[1] < other.destiny[1]):
                 seatmates.append(other)
         return seatmates
     def are_passengers_coming_back(self,passenger):
