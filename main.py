@@ -13,7 +13,7 @@ def conduct_test(test,visualise,should_stow=True):
   plt.savefig(test[0]+".png")
   plt.clf()
 
-ITERATIONS=10
+ITERATIONS=100
 VISUALISE=False
 
 tests = [["RANDOM",random_order()],
