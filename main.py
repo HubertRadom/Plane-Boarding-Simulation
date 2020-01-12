@@ -35,8 +35,8 @@ no_stowing_tests = [["RANDOM NO STOWING",random_order()],
 for test in no_stowing_tests:
   conduct_test(test,VISUALISE,False)
 
-no_shuffling_tests = [["RANDOM NO STOWING",random_without_shuffle()],
-["BACK TO FRONT 4 GROUPS NO STOWING",back_to_front_4_without_shuffle()]]
+no_shuffling_tests = [["RANDOM NO SHUFFLE",random_without_shuffle()],
+["BACK TO FRONT 4 GROUPS NO SHUFFLE",back_to_front_4_without_shuffle()]]
 
 for test in no_shuffling_tests:
   conduct_test(test,VISUALISE)
