@@ -23,7 +23,7 @@ tests = [["RANDOM",random_order()],
 ["FRONT TO BACK GROUP 4",front_to_back_4()],
 ["WINDOW MIDDLE ISLE",window_middle_isle()],
 ["STEFFEN PERFECT",steffen_perfect()],
-"STEFFEN MODIFIED",steffen_modified()]
+["STEFFEN MODIFIED",steffen_modified()]]
 
 for test in tests:
   conduct_test(test,VISUALISE)
