@@ -21,8 +21,6 @@ class Game():
           World.get_instance().add_passenger(Passenger(random.choice(self.randomColors),self.destinies[i],i,stow_times[i]))
       while True:
         steps+=1
-        if self.visualise:
-          World.get_instance().update()
         stepsCounter.updateSteps(steps)
         for passenger in World.get_instance().passengers:
             passenger.move()
@@ -36,5 +34,7 @@ class Game():
             stepsCounter.clear()
             World.get_instance().update()
             break
-        #time.sleep(0.2)
+        if self.visualise:
+          World.get_instance().update()
+          time.sleep(0.2)
       return steps
