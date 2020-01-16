@@ -11,7 +11,7 @@ def conduct_test(test,visualise,should_stow=True,stowing_mean=5.0):
     print("Iteration: "+str(i+1)+"/"+str(ITERATIONS))
     game = Game(test[1](),visualise,stowing_mean)
     STEPS.append(game.play(should_stow))
-  plt.hist(STEPS,5,density=True)
+  plt.hist(STEPS,density=True)
   plt.title('Mean: '+str(sum(STEPS)/len(STEPS)))
   plt.savefig(test[0]+".png")
   plt.clf()
@@ -31,26 +31,13 @@ tests = [
 ["STEFFEN MODIFIED",steffen_modified]]
 
 basicTestHistogramData =[]
-basicTestLabels = []
 
 for test in tests:
   basicTestHistogramData.append(conduct_test(test,VISUALISE))
-  basicTestLabels.append(test[0])
 
 
-with open('data.txt', 'w') as outfile:
+with open('distribution_chart_data.txt', 'w') as outfile:
     json.dump(basicTestHistogramData, outfile)
-
-fig = plt.figure()
-ax = plt.subplot(111)
-ax.hist(basicTestHistogramData,5,density=True,label=basicTestLabels)
-box = ax.get_position()
-ax.set_position([box.x0, box.y0 + box.height * 0.1,
-                 box.width, box.height * 0.9])
-ax.legend(prop={'size': 7},loc='upper center', bbox_to_anchor=(0.5, -0.05),
-          fancybox=True, shadow=True, ncol=4)
-plt.savefig("allHistogram.png")
-plt.clf()
 
 
 no_stowing_tests = [["RANDOM NO STOWING",random_order],
@@ -64,7 +51,7 @@ for test in no_stowing_tests:
 no_shuffling_tests = [["RANDOM NO SHUFFLE",random_without_shuffle],
 ["BACK TO FRONT 4 GROUPS NO SHUFFLE",back_to_front_4_without_shuffle]]
 
-for mean in range(5,56,5):
+for mean in range(1,5):
     random_n_s = no_shuffling_tests[0].copy()
     random_n_s[0]=random_n_s[0]+" "+str(mean)
     data1=conduct_test(random_n_s,VISUALISE,True,mean)
