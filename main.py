@@ -1,7 +1,7 @@
 from GameRunner import Game
 from orders_generation import *
 import matplotlib.pyplot as plt
-
+import json
 
    
 def conduct_test(test,visualise,should_stow=True,stowing_mean=5.0):
@@ -38,6 +38,9 @@ for test in tests:
   basicTestLabels.append(test[0])
 
 
+with open('data.txt', 'w') as outfile:
+    json.dump(basicTestHistogramData, outfile)
+
 fig = plt.figure()
 ax = plt.subplot(111)
 ax.hist(basicTestHistogramData,5,density=True,label=basicTestLabels)
@@ -54,7 +57,9 @@ no_stowing_tests = [["RANDOM NO STOWING",random_order],
 ["BACK TO FRONT 4 GROUPS NO STOWING",back_to_front_4]]
 
 for test in no_stowing_tests:
-  conduct_test(test,VISUALISE,False)
+  data = conduct_test(test,VISUALISE,False)
+  with open(test[0]+'.txt', 'w') as outfile:
+    json.dump(data, outfile)
 
 no_shuffling_tests = [["RANDOM NO SHUFFLE",random_without_shuffle],
 ["BACK TO FRONT 4 GROUPS NO SHUFFLE",back_to_front_4_without_shuffle]]
@@ -62,7 +67,11 @@ no_shuffling_tests = [["RANDOM NO SHUFFLE",random_without_shuffle],
 for mean in range(5,56,5):
     random_n_s = no_shuffling_tests[0].copy()
     random_n_s[0]=random_n_s[0]+" "+str(mean)
-    conduct_test(random_n_s,VISUALISE,True,mean)
+    data1=conduct_test(random_n_s,VISUALISE,True,mean)
+    with open(random_n_s[0]+'.txt', 'w') as outfile:
+        json.dump(data1, outfile)
     btf4_n_s = no_shuffling_tests[1].copy()
     btf4_n_s[0]=btf4_n_s[0]+" "+str(mean)
-    conduct_test(btf4_n_s,VISUALISE,True,mean)
+    data2=conduct_test(btf4_n_s,VISUALISE,True,mean)
+    with open(btf4_n_s[0]+'.txt', 'w') as outfile:
+        json.dump(data2, outfile)
