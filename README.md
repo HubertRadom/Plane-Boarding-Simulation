@@ -4,4 +4,6 @@ The goal of the project was to simulate and compare different strategies for boa
 Comparing results allowed us to answer for few questions like "How long would the bag stowing need to take for the seat shuffles to cause more delay than the stowing?" and more.
 
 To <b>start</b> the simulation run main.py file.
-If you want to see the visualization, set VISUALIZE value (in main.py) as True. 
+If you want to see the visualization, set VISUALIZE value (in main.py) as True.
+
+trebacz626, HubertRadom
